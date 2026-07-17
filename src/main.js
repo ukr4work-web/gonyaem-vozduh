@@ -46,7 +46,11 @@ socket.on('connect',()=>{
 });
 socket.on('disconnect',()=>setNetwork(false,'НЕТ СВЯЗИ'));
 socket.on('match:start',beginMatch);
-socket.on('state',snapshot=>{game=snapshot;scoreEls.forEach((el,i)=>el.textContent=snapshot.score[i]);const t=snapshot.timeLeft;timerEl.textContent=`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.ceil(t%60)).padStart(2,'0')}`;});
+socket.on('state',snapshot=>{
+  if(snapshot.status==='playing'&&state!=='playing')beginMatch(snapshot);
+  if(snapshot.status==='ended'&&state!=='ended')finish(snapshot);
+  game=snapshot;scoreEls.forEach((el,i)=>el.textContent=snapshot.score[i]);const t=snapshot.timeLeft;timerEl.textContent=`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.ceil(t%60)).padStart(2,'0')}`;
+});
 socket.on('match:goal',({player,score})=>{goalFlash.classList.remove('show');void goalFlash.offsetWidth;goalFlash.classList.add('show');scoreEls.forEach((el,i)=>el.textContent=score[i]);const p=visual.puck;for(let i=0;i<55;i++)particles.push({x:p.x,y:p.y,vx:(Math.random()-.5)*650,vy:(Math.random()-.5)*650,life:1,color:player?'#34a7ff':'#ff3154'});tone(130,.35,'sawtooth',.07);setTimeout(()=>tone(260,.2,'square',.04),90)});
 socket.on('match:end',finish);
 socket.on('room:left',()=>{state='menu';startPanel.hidden=false;endPanel.hidden=true;lobbyActions.hidden=false;waitingPanel.hidden=true;showError('Второй игрок отключился. Создайте новую комнату.');setNetwork(true,'В СЕТИ');room='';playerIndex=null;history.replaceState(null,'',location.pathname)});
