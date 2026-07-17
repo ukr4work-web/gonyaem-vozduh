@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080b16" />
+    <meta name="description" content="Гоняем воздух — аэрохоккей для двух игроков." />
+    <title>Гоняем воздух</title>
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Гоняем воздух — главная">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>ГОНЯЕМ<br><strong>ВОЗДУХ</strong></span>
+        </a>
+        <div class="match-status" aria-live="polite">
+          <span>МАТЧ ДО КОНЦА</span>
+          <strong id="timer">01:30</strong>
+        </div>
+        <button class="sound-button" id="soundButton" type="button" aria-label="Выключить звук" aria-pressed="true">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M11 5 6.7 9H3v6h3.7l4.3 4V5Zm4.7 3.3a5 5 0 0 1 0 7.4M18.5 5a9 9 0 0 1 0 14"/></svg>
+        </button>
+      </header>
+
+      <section class="game-shell" aria-label="Игровое поле">
+        <div class="score-row">
+          <div class="player player-one"><span>ИГРОК 1</span><strong id="score1">0</strong><small>WASD</small></div>
+          <div class="round-label"><i></i><span>РАУНД 1</span><i></i></div>
+          <div class="player player-two"><small>СТРЕЛКИ</small><strong id="score2">0</strong><span>ИГРОК 2</span></div>
+        </div>
+
+        <div class="arena-wrap">
+          <canvas id="game" width="1000" height="600" aria-label="Аэрохоккей: красный игрок слева, синий игрок справа"></canvas>
+          <div class="goal-flash" id="goalFlash" aria-live="assertive">ГОЛ!</div>
+          <div class="start-panel" id="startPanel">
+            <span class="eyebrow" id="connectionLabel">ОНЛАЙН-ДУЭЛЬ · 2 ИГРОКА</span>
+            <h1>ГОНЯЕМ<br><em>ВОЗДУХ</em></h1>
+            <p>Забей больше голов за 90 секунд.<br>И постарайся не смотреть шайбе в глаза.</p>
+            <div class="lobby-actions" id="lobbyActions">
+              <button class="primary-button" id="createButton" type="button">СОЗДАТЬ КОМНАТУ <span>→</span></button>
+              <div class="join-row">
+                <label class="sr-only" for="roomInput">Код комнаты</label>
+                <input id="roomInput" maxlength="5" autocomplete="off" placeholder="КОД" aria-describedby="lobbyError" />
+                <button id="joinButton" type="button">ВОЙТИ</button>
+              </div>
+              <p class="lobby-error" id="lobbyError" aria-live="polite"></p>
+            </div>
+            <div class="waiting" id="waitingPanel" hidden>
+              <span>КОД КОМНАТЫ</span>
+              <strong id="roomCode">—</strong>
+              <button id="copyButton" type="button">СКОПИРОВАТЬ ССЫЛКУ</button>
+              <p>Ждём второго игрока<span class="dots">...</span></p>
+            </div>
+            <small>На телефоне двигай свою биту пальцем · На компьютере — WASD или стрелки</small>
+          </div>
+          <div class="end-panel" id="endPanel" hidden>
+            <span class="eyebrow">ФИНАЛЬНЫЙ СВИСТОК</span>
+            <h2 id="winnerText">НИЧЬЯ!</h2>
+            <p id="finalScore">0 : 0</p>
+            <button class="primary-button" id="restartButton" type="button">РЕВАНШ <span>↻</span></button>
+          </div>
+        </div>
+
+        <footer class="game-footer">
+          <p><span>ПОДСКАЗКА</span> Разгоняй биту перед ударом — скорость передаётся шайбе</p>
+          <span class="network-status" id="networkStatus"><i></i> ПОДКЛЮЧЕНИЕ</span>
+          <button id="resetButton" type="button">ПОКИНУТЬ КОМНАТУ</button>
+        </footer>
+      </section>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
