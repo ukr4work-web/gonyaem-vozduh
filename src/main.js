@@ -14,6 +14,8 @@ let game = { score:[0,0], timeLeft:90, pause:0, paddles:[{x:210,y:300,vx:0,vy:0}
 const visual = structuredClone(game), particles = [];
 const head = new Image(); head.src = headUrl;
 const socket = io({ transports: ['websocket', 'polling'] });
+const requestedRoom = new URLSearchParams(location.search).get('room')?.toUpperCase();
+let autoJoinAttempted = false;
 
 function tone(freq=220,duration=.08,type='square',volume=.035){
   if(!soundOn)return; audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
@@ -33,7 +35,15 @@ function finish(snapshot){game=snapshot;state='ended';const s=snapshot.score;win
 function copyLink(){
   const url=new URL(location.href);url.searchParams.set('room',room);navigator.clipboard.writeText(url.toString()).then(()=>{$('#copyButton').textContent='ССЫЛКА СКОПИРОВАНА';setTimeout(()=>$('#copyButton').textContent='СКОПИРОВАТЬ ССЫЛКУ',1800)});
 }
-socket.on('connect',()=>setNetwork(true,'В СЕТИ'));
+socket.on('connect',()=>{
+  setNetwork(true,'В СЕТИ');
+  if(requestedRoom && !room && !autoJoinAttempted){
+    autoJoinAttempted=true;
+    roomInput.value=requestedRoom;
+    $('#connectionLabel').textContent=`ПОДКЛЮЧАЕМ К КОМНАТЕ ${requestedRoom}`;
+    joinRoom();
+  }
+});
 socket.on('disconnect',()=>setNetwork(false,'НЕТ СВЯЗИ'));
 socket.on('match:start',beginMatch);
 socket.on('state',snapshot=>{game=snapshot;scoreEls.forEach((el,i)=>el.textContent=snapshot.score[i]);const t=snapshot.timeLeft;timerEl.textContent=`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.ceil(t%60)).padStart(2,'0')}`;});
@@ -75,5 +85,5 @@ window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','Arr
 $('#createButton').addEventListener('click',createRoom);$('#joinButton').addEventListener('click',joinRoom);roomInput.addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom()});roomInput.addEventListener('input',()=>roomInput.value=roomInput.value.toUpperCase().replace(/[^A-Z2-9]/g,''));
 $('#copyButton').addEventListener('click',copyLink);$('#restartButton').addEventListener('click',()=>socket.emit('match:rematch'));$('#resetButton').addEventListener('click',()=>location.href=location.pathname);
 soundButton.addEventListener('click',()=>{soundOn=!soundOn;soundButton.setAttribute('aria-pressed',String(soundOn));soundButton.setAttribute('aria-label',soundOn?'Выключить звук':'Включить звук');if(soundOn)tone(440)});
-const requestedRoom=new URLSearchParams(location.search).get('room');if(requestedRoom){roomInput.value=requestedRoom.toUpperCase();$('#connectionLabel').textContent=`ВАС ПРИГЛАСИЛИ В КОМНАТУ ${roomInput.value}`;}
+if(requestedRoom){roomInput.value=requestedRoom;$('#connectionLabel').textContent=`ПОДКЛЮЧАЕМ К КОМНАТЕ ${requestedRoom}`;}
 requestAnimationFrame(loop);
